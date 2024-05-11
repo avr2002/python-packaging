@@ -1,0 +1,14 @@
+README.md
+setup.py
+packaging/__init__.py
+packaging/my_file.py
+packaging/my_other_file.py
+packaging.egg-info/PKG-INFO
+packaging.egg-info/SOURCES.txt
+packaging.egg-info/dependency_links.txt
+packaging.egg-info/requires.txt
+packaging.egg-info/top_level.txt
+packaging/my_folder/__init__.py
+packaging/my_folder/my_nested_file.py
+packaging/my_folder/my_sub_package/__init__.py
+packaging/my_folder/my_sub_package/nested_module.py
