@@ -22,7 +22,5 @@ setup(
     # Set the long description from README.md
     long_description=read_file("README.md"),
     long_description_content_type="text/markdown",
-    install_requires=[
-        "numpy"
-    ]
+    install_requires=["numpy"],
 )
