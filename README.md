@@ -182,3 +182,41 @@ For example, popular distribution packages include `numpy`, `fast-api`, `pandas`
   - Consider the user's perspective when choosing the appropriate distribution format.
   - Provide clear documentation and guidance for users installing packages with compilation requirements.
 
+
+## `build` CLI tool and `pyproject.toml`
+
+- “Build dependencies” are anything that must be installed on your system in order to build your distribution package into an sdist or wheel.
+    
+    For example, we needed to `pip install wheel` in order to run `python setup.py bdist_wheel` so `wheel` is a build dependency for building wheels.
+    
+- [`setup.py`](http://setup.py) files can get complex.
+    
+    You may need to `pip install ...` external libraries and import them into your `setup.py` file to accommodate complex build processes.
+    
+    The lecture shows `pytorch` and `airflow` as examples of packages with complex [`setup.py`](http://setup.py) files.
+    
+- Somehow you need to be able to document build dependencies *outside* of [`setup.py`](http://setup.py).
+    
+    If they were documented in the `setup.py` file… you would not be able to execute the `setup.py` file to read the documented dependencies (like if they were specified in an `list` somewhere in the file).
+    
+    This is the original problem `pyproject.toml` was meant to solve.
+    
+    ```toml
+    # pyproject.toml
+    
+    [build-system]
+    # Minimum requirements for the build system to execute.
+    requires = ["setuptools>=62.0.0", "wheel"]
+    ```
+    
+    `pyproject.toml` sits adjacent to [`setup.py`](http://setup.py) in the file tree
+
+- The `build` CLI tool (`pip install build`) is a special project by the Python Packaging Authority (PyPA) which
+    1. reads the `[build-system]` table in the `pyproject.toml`,
+    2. installs those dependencies into an isolated virtual environment, 
+    3. and then builds the sdist and wheel
+    
+    ```toml
+    pip install build
+    python -m build --sdist --wheel path/to/dir/with/setup.py/and/pyproject.toml
+    ```
