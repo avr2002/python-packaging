@@ -80,7 +80,7 @@ For example, popular distribution packages include `numpy`, `fast-api`, `pandas`
 
 1. If changes are made in the package then use `pip install .` which will build and install the latest package on the fly.
 
-2. Or simply use editable so that you don't always have to rebuild the package evrerytime new changes are made: 
+2. Or simply use editable so that you don't always have to rebuild the package evrerytime new changes are made:
       - `pip install --editable .`
 
 
@@ -132,7 +132,7 @@ For example, popular distribution packages include `numpy`, `fast-api`, `pandas`
   - Unfortunately, building wheels for *all* operating systems gets difficult if you have a compilation step required, so some OSS maintainers only build wheels for a single OS.
 
     - Whenever a wheel is not available for your OS, `pip` actually executes the [`setup.py`](http://setup.py) (or equivalent files) on *your* machine, right after downloading the sdist.
-  
+
   - Building the wheel might require compiling code
     - Compiling code can be *really* slow, 5-10-30 minutes or even more, especially if the machine is weak
     - Compiling code requires dependencies, e.g. `gcc` if the source code is in C, but other languages require their own compilers. The user must install these on their on machine or the `pip install ...` will simply fail. This can happen when you install `numpy`, `pandas`, `scipy`, `pytorch`, `tensorflow`, etc.
@@ -177,7 +177,7 @@ For example, popular distribution packages include `numpy`, `fast-api`, `pandas`
 
 - **Package Maintenance**:
   - Maintainers should strive to provide both `sdist` and `bdist_wheel` distributions to maximize compatibility and ease of use for users.
-  
+
 - **Consider User Experience**:
   - Consider the user's perspective when choosing the appropriate distribution format.
   - Provide clear documentation and guidance for users installing packages with compilation requirements.
@@ -185,38 +185,229 @@ For example, popular distribution packages include `numpy`, `fast-api`, `pandas`
 
 ## `build` CLI tool and `pyproject.toml`
 
-- “Build dependencies” are anything that must be installed on your system in order to build your distribution package into an sdist or wheel.
-    
+- "Build dependencies" are anything that must be installed on your system in order to build your distribution package into an sdist or wheel.
+
     For example, we needed to `pip install wheel` in order to run `python setup.py bdist_wheel` so `wheel` is a build dependency for building wheels.
-    
+
 - [`setup.py`](http://setup.py) files can get complex.
-    
+
     You may need to `pip install ...` external libraries and import them into your `setup.py` file to accommodate complex build processes.
-    
+
     The lecture shows `pytorch` and `airflow` as examples of packages with complex [`setup.py`](http://setup.py) files.
-    
+
 - Somehow you need to be able to document build dependencies *outside* of [`setup.py`](http://setup.py).
-    
+
     If they were documented in the `setup.py` file… you would not be able to execute the `setup.py` file to read the documented dependencies (like if they were specified in an `list` somewhere in the file).
-    
+
     This is the original problem `pyproject.toml` was meant to solve.
-    
+
     ```toml
     # pyproject.toml
-    
+
     [build-system]
     # Minimum requirements for the build system to execute.
     requires = ["setuptools>=62.0.0", "wheel"]
     ```
-    
+
     `pyproject.toml` sits adjacent to [`setup.py`](http://setup.py) in the file tree
 
 - The `build` CLI tool (`pip install build`) is a special project by the Python Packaging Authority (PyPA) which
     1. reads the `[build-system]` table in the `pyproject.toml`,
-    2. installs those dependencies into an isolated virtual environment, 
+    2. installs those dependencies into an isolated virtual environment,
     3. and then builds the sdist and wheel
-    
+
     ```bash
     pip install build
-    python -m build --sdist --wheel path/to/dir/with/setup.py/and/pyproject.toml
+
+    # both setup.py and pypproject.toml should be together, ideally in the root directory
+    # python -m build --sdist --wheel path/to/dir/with/setup.py/and/pyproject.toml
+
+    python -m build --sdist --wheel .
     ```
+
+
+## Moving from `setup.py` to `setup.cfg` config file
+
+>>Moving from
+
+```python
+# setup.py
+from pathlib import Path
+
+from setuptools import find_packages, setup
+import wheel
+
+
+# Function to read the contents of README.md
+def read_file(filename: str) -> str:
+    filepath = Path(__file__).resolve().parent / filename
+    with open(filepath, encoding="utf-8") as file:
+        return file.read()
+
+
+setup(
+    name="packaging-demo",
+    version="0.0.0",
+    packages=find_packages(),
+    # package meta-data
+    author="Amit Vikram Raj",
+    author_email="avr13405@gmail.com",
+    description="Demo for Python Packaging",
+    license="MIT",
+    # Set the long description from README.md
+    long_description=read_file("README.md"),
+    long_description_content_type="text/markdown",
+    # install requires: libraries that are needed for the package to work
+    install_requires=[
+        "numpy",  # our package depends on numpy
+    ],
+    # setup requires: the libraries that are needed to setup/build
+    # the package distribution
+    # setup_requires=[
+    #     "wheel",  # to build the binary distribution we need wheel package
+    # ],
+)
+```
+
+>>TO
+
+```python
+# setup.py
+from setuptools import setup
+
+# Now setup.py takes it's configurations from setup.cfg file
+setup()
+```
+
+```ini
+[metadata]
+name = packaging-demo
+version = attr: packaging_demo.VERSION
+author = Amit Vikram Raj
+author_email = avr13405@gmail.com
+description = Demo for Python Packaging
+long_description = file: README.md
+keywords = one, two
+license = MIT
+classifiers =
+    Framework :: Django
+    Programming Language :: Python :: 3
+
+[options]
+zip_safe = False
+include_package_data = True
+# same as find_packages() in setup()
+packages = find:
+python_requires = >=3.8
+install_requires =
+    numpy
+    importlib-metadata; python_version<"3.10"
+```
+
+>>ALSO addtional setting is passed to `pyproject.toml` file.
+>>Here we have specified `build-system` similar to `setup_requires` in `setup.py`
+
+```toml
+# pyproject.toml
+
+[build-system]
+# Minimum requirements for the build system to execute
+requires = ["setuptools", "wheel", "numpy<1.24.3"]
+
+
+# Adding ruff.toml to pyproject.toml
+[tool.ruff]
+line-length = 99
+
+[tool.ruff.lint]
+# 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
+select = ["E", "F", "B", "ERA"]
+
+# 2. Avoid enforcing line-length violations (`E501`)
+ignore = ["E501"]
+
+# 3. Avoid trying to fix flake8-bugbear (`B`) violations.
+unfixable = ["B"]
+
+# 4. Ignore `E402` (import violations) in all `__init__.py` files, and in select subdirectories.
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402"]
+
+
+# copying isort configurations from .isort.cfg to pyproject.toml
+[tool.isort]
+profile = "black"
+multi_line_output = "VERTICAL_HANGING_INDENT"
+force_grid_wrap = 2
+line_length = 99
+
+# copying balck config from .black.toml to pyproject.toml
+[tool.black]
+line-length = 99
+exclude = ".venv"
+
+# copying flake8 config from .flake8 to pyproject.toml
+[tool.flake8]
+docstring-convention = "all"
+extend-ignore = ["D107", "D212", "E501", "W503", "W605", "D203", "D100", 
+                 "E305", "E701", "DAR101", "DAR201"]
+exclude = [".venv"]
+max-line-length = 99
+
+# radon
+radon-max-cc = 10
+
+
+# copying pylint config from .pylintrc to pyproject.toml
+[tool.pylint."messages control"]
+disable = [
+    "line-too-long",
+    "trailing-whitespace",
+    "missing-function-docstring",
+    "consider-using-f-string",
+    "import-error",
+    "too-few-public-methods",
+    "redefined-outer-name",
+]
+```
+
+- We have been treating [`setup.py`](http://setup.py) as a glorified config file, not really taking advantage of the fact that it is a Python file by adding logic to it.
+    
+    This is more common than not. Also, there has been a general shift away from using Python for config files because doing so adds complexity to *using* the config files (like having to install libraries in order to execute the config file).
+    
+- `setup.cfg` is a companion file to [`setup.py`](http://setup.py) that allows us to define our package configuration in a static text file—specifically an [INI format](https://en.wikipedia.org/wiki/INI_file) file.
+    
+    <aside>
+    💡 INI is a problematic, weak file format compared to more “modern” formats like JSON, YAML, and *TOML*. We will prefer TOML as we move forward.
+    
+    </aside>
+
+- Any values that we do not directly pass as arguments to setup() will be looked for by the setup() invocation in a setup.cfg file, which is meant to sit adjacent to setup.py in the file tree if used.
+
+
+* **
+
+
+- Now we are accumulating a lot of files!
+    - `setup.py`
+    - `setup.cfg`
+    - `pyproject.toml`
+    - `README.md`
+    - More files for linting and other code quality tools, e.g. `.pylintrc`, `.flake8`, `.blackrc`, `ruff.toml`, `.mypy`, `pre-commit-config.yaml`, etc.
+    - More files we have not talked about yet:
+        - `CHANGELOG` or `CHANGELOG.md`
+        - `VERSION` or `version.txt`
+    
+    It turns out that nearly all of these files can be replaced with `pyproject.toml` . Nearly every linting / code quality tool supports parsing a section called `[tool.<name>]` e.g. `[tool.black]` section of `pyproject.toml` to read its configuration!
+    
+    The docs of each individual tool should tell you how to accomplish this. 
+    
+    <aside>
+    💡 **Note:** Some tools such as `flake8` at the time of this writing have not yet supported `pyproject.toml` 
+    
+    For those, there is often an adapter extension like `Flake8-pyproject` which adds this capability.
+    
+    </aside>
+    
+    Above shown is a `pyproject.toml` with configurations for many of the linting tools we have used in the course.

@@ -1,3 +1,71 @@
 [build-system]
 # Minimum requirements for the build system to execute
 requires = ["setuptools", "wheel", "numpy<1.24.3"]
+
+
+# Adding ruff.toml to pyproject.toml
+[tool.ruff]
+line-length = 99
+
+[tool.ruff.lint]
+# 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
+select = ["E", "F", "B", "ERA"]
+
+# 2. Avoid enforcing line-length violations (`E501`)
+ignore = ["E501"]
+
+# 3. Avoid trying to fix flake8-bugbear (`B`) violations.
+unfixable = ["B"]
+
+# 4. Ignore `E402` (import violations) in all `__init__.py` files, and in select subdirectories.
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402"]
+
+
+# copying isort configurations from .isort.cfg to pyproject.toml
+[tool.isort]
+profile = "black"
+multi_line_output = "VERTICAL_HANGING_INDENT"
+force_grid_wrap = 2
+line_length = 99
+
+# copying balck config from .black.toml to pyproject.toml
+[tool.black]
+line-length = 99
+exclude = ".venv"
+
+# copying flake8 config from .flake8 to pyproject.toml
+[tool.flake8]
+docstring-convention = "all"
+extend-ignore = [
+    "D107",
+    "D212",
+    "E501",
+    "W503",
+    "W605",
+    "D203",
+    "D100",
+    "E305",
+    "E701",
+    "DAR101",
+    "DAR201",
+]
+exclude = [".venv"]
+max-line-length = 99
+
+# radon
+radon-max-cc = 10
+
+
+# copying pylint config from .pylintrc to pyproject.toml
+[tool.pylint."messages control"]
+disable = [
+    "line-too-long",
+    "trailing-whitespace",
+    "missing-function-docstring",
+    "consider-using-f-string",
+    "import-error",
+    "too-few-public-methods",
+    "redefined-outer-name",
+]

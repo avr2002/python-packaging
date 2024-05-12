@@ -25,12 +25,12 @@ CONSTANT = "HELLO"
 print(CONST)
 ```
 
-The issue we are addressing involves the inability to import modules correctly when running a Python script (`my_nested_file.py`) located in a nested directory (`my_folder`) relative to a custom module directory (`/home/avr27/repos`). 
+The issue we are addressing involves the inability to import modules correctly when running a Python script (`my_nested_file.py`) located in a nested directory (`my_folder`) relative to a custom module directory (`/home/avr27/repos`).
 
 When attempting to execute the script using `python my_folder/my_nested_file.py`, Python encounters a `ModuleNotFoundError` because it cannot locate the desired module (`packaging.my_other_file`) within the specified path (`/home/avr27/repos`).
 
 ```bash
-$ python my_folder/my_nested_file.py                                                                                       
+$ python my_folder/my_nested_file.py  
 Traceback (most recent call last):
   File "/home/avr27/repos/packaging/my_folder/my_nested_file.py", line 1, in <module>
     from packaging.my_other_file import CONSTANT as CONST
