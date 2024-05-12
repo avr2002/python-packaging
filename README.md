@@ -216,7 +216,7 @@ For example, popular distribution packages include `numpy`, `fast-api`, `pandas`
     2. installs those dependencies into an isolated virtual environment, 
     3. and then builds the sdist and wheel
     
-    ```toml
+    ```bash
     pip install build
     python -m build --sdist --wheel path/to/dir/with/setup.py/and/pyproject.toml
     ```
