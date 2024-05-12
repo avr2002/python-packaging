@@ -403,11 +403,4 @@ disable = [
     
     The docs of each individual tool should tell you how to accomplish this. 
     
-    <aside>
-    💡 **Note:** Some tools such as `flake8` at the time of this writing have not yet supported `pyproject.toml` 
-    
-    For those, there is often an adapter extension like `Flake8-pyproject` which adds this capability.
-    
-    </aside>
-    
     Above shown is a `pyproject.toml` with configurations for many of the linting tools we have used in the course.
