@@ -226,7 +226,7 @@ For example, popular distribution packages include `numpy`, `fast-api`, `pandas`
     ```
 
 
-## Moving from `setup.py` to `setup.cfg` config file
+## Moving from `setup.py` to [`setup.cfg`](https://setuptools.pypa.io/en/latest/userguide/declarative_config.html) config file
 
 >>Moving from
 
@@ -280,6 +280,8 @@ setup()
 ```
 
 ```ini
+# setup.cfg
+
 [metadata]
 name = packaging-demo
 version = attr: packaging_demo.VERSION
@@ -404,3 +406,122 @@ disable = [
     The docs of each individual tool should tell you how to accomplish this. 
     
     Above shown is a `pyproject.toml` with configurations for many of the linting tools we have used in the course.
+
+
+>**Can `setup.cfg` and `setup.py` be replaced as well?**
+
+
+## [Moving `setup.cfg` to `pyproject.toml`](https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html)
+
+>FROM `setup.cfg` 
+```ini
+# setup.cfg
+[metadata]
+name = packaging-demo
+version = attr: packaging_demo.VERSION
+author = Amit Vikram Raj
+author_email = avr13405@gmail.com
+description = Demo for Python Packaging
+long_description = file: README.md
+keywords = one, two
+license = MIT
+classifiers =
+    Programming Language :: Python :: 3
+
+[options]
+zip_safe = False
+include_package_data = True
+# same as find_packages() in setup()
+packages = find:
+python_requires = >=3.8
+install_requires =
+    numpy
+    importlib-metadata; python_version<"3.10"
+```
+
+>TO
+
+```toml
+# pyproject.toml
+
+[build-system]
+# Minimum requirements for the build system to execute
+requires = ["setuptools>=61.0.0", "wheel"]
+
+# Adding these from setup.cfg in pyproject.toml file
+[project]
+name = "packaging-demo"
+authors = [{ name = "Amit Vikram Raj", email = "avr13405@gmail.com" }]
+description = "Demo for Python Packaging"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["one", "two"]
+license = { text = "MIT" }
+classifiers = ["Programming Language :: Python :: 3"]
+dependencies = ["numpy", 'importlib-metadata; python_version<"3.10"']
+# dynamic = ["version"]
+version = "0.0.0"
+```
+
+>> `python -m build --sdist --wheel .` - Runs perfectly, we got rid of another config file (`setup.cfg`)
+
+
+## Replacing `setup.py` with `build-backend`
+
+
+- [PEP 517](https://peps.python.org/pep-0517/) added a `build-backend` argument to `pyproject.toml` like so:
+    
+    ```toml
+    [build-system]
+    # Defined by PEP 518:
+    requires = ["flit"]
+    # Defined by this PEP:
+    build-backend = "flit.api:main"
+    ```
+
+    ```python
+    # The above toml config is equivalent to
+    import flit.api
+    backend = flit.api.main
+    ```
+    
+- The `build-backend` defines an entrypoint (executable Python module in this case) that the `build` CLI uses to actually do the work of parsing `pyproject.toml` and building the wheel and sdist.
+
+- This means *you* could implement your own build backend today by writing a program that does that, and you could use it by adding your package to `requires = [...]` and specifying the entrypoint in `build-backend = ...`.
+
+
+- If you do not specify a `build-backend` in `pyproject.toml`, setuptools is assumed and package will get bulit prefectly fine.
+  - If we remove `setup.py` and run `python -m build --sdist --wheel .` it runs perfectly without it because the default value of `build-system` is set as `build-backend = "setuptools.build_meta"` in `build` CLI which builds our package.
+
+- But you can still explicitly declare `setuptools` as your build backend like this
+    
+    ```toml
+    # pyproject.toml
+    
+    ...
+    
+    [build-system]
+    requires = ["setuptools>=61.0.0", "wheel"]
+    build-backend = "setuptools.build_meta"
+    
+    ...
+    ```
+    
+    Each build backend typically extends the `pyproject.toml` file with its own configuration options. For example,
+    
+    ```toml
+    # pyproject.toml
+    
+    ...
+    
+    [tool.setuptools.package-data]
+    package_demo = ["*.json"]
+    
+    [tool.setuptools.dynamic]
+    version = {file = "version.txt"}
+    long_description = {file = "README.md"}
+    
+    ...
+    ```
+    
+- If you choose to use `setuptools` in your project, you can add these sections to `pyproject.toml`. You can read more about this in the `setuptools` documentation

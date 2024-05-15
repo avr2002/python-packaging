@@ -1,6 +1,21 @@
 [build-system]
 # Minimum requirements for the build system to execute
-requires = ["setuptools", "wheel", "numpy<1.24.3"]
+requires = ["setuptools>=61.0.0", "wheel"]
+# default value of build-backend is "setuptools.build_meta"
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "packaging-demo"
+authors = [{ name = "Amit Vikram Raj", email = "avr13405@gmail.com" }]
+description = "Demo for Python Packaging"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["one", "two"]
+license = { text = "MIT" }
+classifiers = ["Programming Language :: Python :: 3"]
+dependencies = ["numpy", 'importlib-metadata; python_version<"3.10"']
+# dynamic = ["version"]
+version = "0.0.0"
 
 
 # Adding ruff.toml to pyproject.toml
