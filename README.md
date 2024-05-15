@@ -525,3 +525,58 @@ version = "0.0.0"
     ```
     
 - If you choose to use `setuptools` in your project, you can add these sections to `pyproject.toml`. You can read more about this in the `setuptools` documentation
+
+
+## Adding Data Files in our Package
+
+- It's often beneficial to include non-python files like data files or binary files inside of your package because oftentimes your Python code relies on these non-python files.
+
+- And then we saw that if we're going to include those files, we need to get those files to end up inside of our package folder because it's our package folder that ends up inside of our users virtual environments upon installation.
+
+- We also saw that by default, all non-python files don't make it into that final virtual environment folder. That is, don't actually make it into our package folder during build procedure.
+
+So, how do we make sure that these files end up in our wheel/dist build of our package? For example here we demo with `cities.json` file that we want in our package as it's used by `states_info.py` file.
+
+>[**Official `setuptools` Docs for Data Support**](https://setuptools.pypa.io/en/latest/userguide/datafiles.html)
+
+### Using [MANIFEST.in](https://setuptools.pypa.io/en/latest/userguide/miscellaneous.html#using-manifest-in) File
+
+
+```toml
+[tool.setuptools]
+# ...
+# By default, include-package-data is true in pyproject.toml, so you do
+# NOT have to specify this line.
+include-package-data = true
+```
+
+So, setuptools by default has this `include-package-data` value set to `true` as shown in the [official docs](https://setuptools.pypa.io/en/latest/userguide/datafiles.html) but we need to create an extra file `MANIFEST.in` and specify the data which we want to inculde in our package present at root dir.
+
+>>**IMP:** It's import all the folders in the package directory should have `__init__.py` file inculing the data directory which we want to include because the `find_packages()` recusrive process that setuptools does will not go into fo;ders that have `__init__.py` file in it.
+
+```in
+include packaging_demo/*.json
+include packaging_demo/my_folder/*.json
+
+OR
+Recursive include all json files in the package directory
+
+recursive-include packaging_demo/ *.json
+```
+
+>[Docs on configuring MANIFEST.in file](https://setuptools.pypa.io/en/latest/userguide/miscellaneous.html#using-manifest-in)
+
+### Without using `MANIFEST.in` file
+
+From [setuptools docs](https://setuptools.pypa.io/en/latest/userguide/datafiles.html) we can add this in our `pyproject.toml` file:
+
+```toml
+# this is by default true so no need to explicitly add it
+# but as mentioned in the docs, it is false for other methods like setup.py or setup.cfg
+[tool.setuptools]
+include-package-data = true
+
+# add the data here, it's finding the files recursively
+[tool.setuptools.package-data]
+package_demo = ["*.json"]
+```

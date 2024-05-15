@@ -4,6 +4,10 @@ requires = ["setuptools>=61.0.0", "wheel"]
 # default value of build-backend is "setuptools.build_meta"
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.package-data]
+package_demo = ["*.json"]
+
+
 [project]
 name = "packaging-demo"
 authors = [{ name = "Amit Vikram Raj", email = "avr13405@gmail.com" }]
@@ -20,7 +24,7 @@ version = "0.0.0"
 
 # Adding ruff.toml to pyproject.toml
 [tool.ruff]
-line-length = 99
+line-length = 119
 
 [tool.ruff.lint]
 # 1. Enable flake8-bugbear (`B`) rules, in addition to the defaults.
@@ -43,11 +47,11 @@ unfixable = ["B"]
 profile = "black"
 multi_line_output = "VERTICAL_HANGING_INDENT"
 force_grid_wrap = 2
-line_length = 99
+line_length = 119
 
 # copying balck config from .black.toml to pyproject.toml
 [tool.black]
-line-length = 99
+line-length = 119
 exclude = ".venv"
 
 # copying flake8 config from .flake8 to pyproject.toml
@@ -64,10 +68,9 @@ extend-ignore = [
     "E305",
     "E701",
     "DAR101",
-    "DAR201",
-]
+    "DAR201",]
 exclude = [".venv"]
-max-line-length = 99
+max-line-length = 119
 
 # radon
 radon-max-cc = 10
@@ -82,5 +85,4 @@ disable = [
     "consider-using-f-string",
     "import-error",
     "too-few-public-methods",
-    "redefined-outer-name",
-]
+    "redefined-outer-name",]
