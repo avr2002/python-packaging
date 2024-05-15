@@ -580,3 +580,23 @@ include-package-data = true
 [tool.setuptools.package-data]
 package_demo = ["*.json"]
 ```
+
+
+## Other `build-backend` systems than `setuptools`
+
+Other than `setuptools` we can use these build backend systems. The point to note is when using other systems the `pyproject.toml` cofiguration should follow their standerds.
+
+1. [Hatch](https://hatch.pypa.io/1.9/config/build)
+  
+    ```toml
+    [build-system]
+    requires = ["hatchling"]
+    build-backend = "hatchling.build"
+    ```
+2. [Poetry](https://python-poetry.org/docs/pyproject/)
+
+    ```toml
+    [build-system]
+    requires = ["poetry-core>=1.0.0"]
+    build-backend = "poetry.core.masonry.api"
+    ```
