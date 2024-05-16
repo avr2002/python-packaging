@@ -543,6 +543,8 @@ So, how do we make sure that these files end up in our wheel/dist build of our p
 
 
 ```toml
+# pyprject.toml
+
 [tool.setuptools]
 # ...
 # By default, include-package-data is true in pyproject.toml, so you do
@@ -555,6 +557,8 @@ So, setuptools by default has this `include-package-data` value set to `true` as
 >>**IMP:** It's import all the folders in the package directory should have `__init__.py` file inculing the data directory which we want to include because the `find_packages()` recusrive process that setuptools does will not go into fo;ders that have `__init__.py` file in it.
 
 ```in
+#  MANIFEST.in 
+
 include packaging_demo/*.json
 include packaging_demo/my_folder/*.json
 
@@ -600,3 +604,86 @@ Other than `setuptools` we can use these build backend systems. The point to not
     requires = ["poetry-core>=1.0.0"]
     build-backend = "poetry.core.masonry.api"
     ```
+
+## Reproducibility, Dependency Graph, Locking Dependencies, Dependency Hell
+
+- Documenting the exact versions of our dependencies and their dependencies and so on.
+
+- It's advisable to have as little as possible number of dependencies associated with our package, as it can lead to dependency hell, or dependency conflict with other package as explained in the lectures.
+
+- The more complex the dependency tree higher the chance of conflicts with future version of other libraries.
+
+- [Dependency Graph Analysis By Eric](https://github.com/avr2002/dependency-graph-pip-analysis)
+
+- Keeping the pinned versions of dependencies and python versions is advicable for troubleshooting purposes:
+  - `pip freeze > requirements.txt`
+  
+
+```bash
+pip install pipdeptree graphviz
+
+sudo apt-get install graphviz    
+
+# generate the dependency graph
+pipdeptree -p packaging-demo --graph-output png > dependency-graph.png
+```
+
+<img src='./packaging_demo/assets/dependency-graph.png' alt='Dependency Graph of packaging-demo package' title='Dependency Graph of packaging-demo package'>
+
+* **
+
+## Adding Optional/Extra Dependencies to our Project
+
+```toml
+[project.optional-dependencies]
+dev = ["ruff", "mypy", "black"]
+```
+
+```bash
+# installing our package with optional dependencies
+pip install '.[dev]'
+```
+
+* **
+
+```toml
+[project.optional-dependencies]
+# for developement
+dev = ["ruff", "mypy", "black"]
+# plugin based architecture
+colors = ["rich"]
+```
+
+```bash
+# plugin based installation
+pip install '.[colors]'
+# here we demo with rich library, if user wants the output to be 
+# colorized then they can install our package like this.
+
+
+# we can add multiple optional dependencies like:
+pip install '.[colors, dev]'
+```
+
+* **
+
+```toml
+[project.optional-dependencies]
+# for developement
+dev = ["ruff", "mypy", "black"]
+# plugin based architecture
+colors = ["rich"]
+# install all dependencies
+all = ["packaging-demo[dev, colors]"]
+```
+
+```bash
+# Installing all dependencies all at once
+pip install '.[all]'
+```
+
+
+## Shopping for dependencies
+
+We can use [Snyk](https://snyk.io/advisor/python/fastapi) to check how stable, well supported, if any security issues, etc. are present for the dependencies which we are going to use for our package and then take the decision on using it in our project.
+

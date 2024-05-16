@@ -5,7 +5,7 @@ requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
-package_demo = ["*.json"]
+package_demo = ["*.json", "assets/*.png"]
 
 
 [project]
@@ -17,9 +17,17 @@ requires-python = ">=3.8"
 keywords = ["one", "two"]
 license = { text = "MIT" }
 classifiers = ["Programming Language :: Python :: 3"]
-dependencies = ["numpy", 'importlib-metadata; python_version<"3.10"']
+dependencies = ["numpy", "fastapi", 'importlib-metadata; python_version<"3.10"']
 # dynamic = ["version"]
 version = "0.0.0"
+
+[project.optional-dependencies]
+# for developement
+dev = ["ruff", "mypy", "black"]
+# plugin based architecture
+colors = ["rich"]
+# install all dependencies
+all = ["packaging-demo[dev, colors]"]
 
 
 # Adding ruff.toml to pyproject.toml
