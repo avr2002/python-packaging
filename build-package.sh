@@ -20,6 +20,7 @@ find . \
 
 # rebuild and unzip the wheel
 python -m build --sdist --wheel ./
-cd dist
-unzip *.whl
-cd ..
+
+# cd dist
+# unzip *.whl
+# cd ..

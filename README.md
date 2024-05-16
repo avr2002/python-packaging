@@ -1,3 +1,10 @@
+## Why package your Python code?
+
+1. Distributing your code
+2. Non-painful import statements
+3. Reproduciblity
+
+
 ## Packaging terms:
 
 - module
