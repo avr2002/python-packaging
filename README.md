@@ -12,6 +12,8 @@
 - sub-package
 - distribution package
 
+> [**Official Python Packaging Guide**](https://packaging.python.org/en/latest/)
+
 
 
 ### Module
@@ -359,7 +361,7 @@ exclude = ".venv"
 # copying flake8 config from .flake8 to pyproject.toml
 [tool.flake8]
 docstring-convention = "all"
-extend-ignore = ["D107", "D212", "E501", "W503", "W605", "D203", "D100", 
+extend-ignore = ["D107", "D212", "E501", "W503", "W605", "D203", "D100",
                  "E305", "E701", "DAR101", "DAR201"]
 exclude = [".venv"]
 max-line-length = 99
@@ -382,14 +384,14 @@ disable = [
 ```
 
 - We have been treating [`setup.py`](http://setup.py) as a glorified config file, not really taking advantage of the fact that it is a Python file by adding logic to it.
-    
+
     This is more common than not. Also, there has been a general shift away from using Python for config files because doing so adds complexity to *using* the config files (like having to install libraries in order to execute the config file).
-    
+
 - `setup.cfg` is a companion file to [`setup.py`](http://setup.py) that allows us to define our package configuration in a static text file—specifically an [INI format](https://en.wikipedia.org/wiki/INI_file) file.
-    
+
     <aside>
     💡 INI is a problematic, weak file format compared to more “modern” formats like JSON, YAML, and *TOML*. We will prefer TOML as we move forward.
-    
+
     </aside>
 
 - Any values that we do not directly pass as arguments to setup() will be looked for by the setup() invocation in a setup.cfg file, which is meant to sit adjacent to setup.py in the file tree if used.
@@ -407,11 +409,11 @@ disable = [
     - More files we have not talked about yet:
         - `CHANGELOG` or `CHANGELOG.md`
         - `VERSION` or `version.txt`
-    
+
     It turns out that nearly all of these files can be replaced with `pyproject.toml` . Nearly every linting / code quality tool supports parsing a section called `[tool.<name>]` e.g. `[tool.black]` section of `pyproject.toml` to read its configuration!
-    
-    The docs of each individual tool should tell you how to accomplish this. 
-    
+
+    The docs of each individual tool should tell you how to accomplish this.
+
     Above shown is a `pyproject.toml` with configurations for many of the linting tools we have used in the course.
 
 
@@ -420,7 +422,7 @@ disable = [
 
 ## [Moving `setup.cfg` to `pyproject.toml`](https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html)
 
->FROM `setup.cfg` 
+>FROM `setup.cfg`
 ```ini
 # setup.cfg
 [metadata]
@@ -477,7 +479,7 @@ version = "0.0.0"
 
 
 - [PEP 517](https://peps.python.org/pep-0517/) added a `build-backend` argument to `pyproject.toml` like so:
-    
+
     ```toml
     [build-system]
     # Defined by PEP 518:
@@ -491,7 +493,7 @@ version = "0.0.0"
     import flit.api
     backend = flit.api.main
     ```
-    
+
 - The `build-backend` defines an entrypoint (executable Python module in this case) that the `build` CLI uses to actually do the work of parsing `pyproject.toml` and building the wheel and sdist.
 
 - This means *you* could implement your own build backend today by writing a program that does that, and you could use it by adding your package to `requires = [...]` and specifying the entrypoint in `build-backend = ...`.
@@ -501,36 +503,36 @@ version = "0.0.0"
   - If we remove `setup.py` and run `python -m build --sdist --wheel .` it runs perfectly without it because the default value of `build-system` is set as `build-backend = "setuptools.build_meta"` in `build` CLI which builds our package.
 
 - But you can still explicitly declare `setuptools` as your build backend like this
-    
+
     ```toml
     # pyproject.toml
-    
+
     ...
-    
+
     [build-system]
     requires = ["setuptools>=61.0.0", "wheel"]
     build-backend = "setuptools.build_meta"
-    
+
     ...
     ```
-    
+
     Each build backend typically extends the `pyproject.toml` file with its own configuration options. For example,
-    
+
     ```toml
     # pyproject.toml
-    
+
     ...
-    
+
     [tool.setuptools.package-data]
     package_demo = ["*.json"]
-    
+
     [tool.setuptools.dynamic]
     version = {file = "version.txt"}
     long_description = {file = "README.md"}
-    
+
     ...
     ```
-    
+
 - If you choose to use `setuptools` in your project, you can add these sections to `pyproject.toml`. You can read more about this in the `setuptools` documentation
 
 
@@ -564,7 +566,7 @@ So, setuptools by default has this `include-package-data` value set to `true` as
 >>**IMP:** It's import all the folders in the package directory should have `__init__.py` file inculing the data directory which we want to include because the `find_packages()` recusrive process that setuptools does will not go into fo;ders that have `__init__.py` file in it.
 
 ```in
-#  MANIFEST.in 
+#  MANIFEST.in
 
 include packaging_demo/*.json
 include packaging_demo/my_folder/*.json
@@ -598,7 +600,7 @@ package_demo = ["*.json"]
 Other than `setuptools` we can use these build backend systems. The point to note is when using other systems the `pyproject.toml` cofiguration should follow their standerds.
 
 1. [Hatch](https://hatch.pypa.io/1.9/config/build)
-  
+
     ```toml
     [build-system]
     requires = ["hatchling"]
@@ -624,18 +626,20 @@ Other than `setuptools` we can use these build backend systems. The point to not
 
 - Keeping the pinned versions of dependencies and python versions is advicable for troubleshooting purposes:
   - `pip freeze > requirements.txt`
-  
+
 
 ```bash
 pip install pipdeptree graphviz
 
-sudo apt-get install graphviz    
+sudo apt-get install graphviz  
 
 # generate the dependency graph
 pipdeptree -p packaging-demo --graph-output png > dependency-graph.png
 ```
 
-<img src='./packaging_demo/assets/dependency-graph.png' alt='Dependency Graph of packaging-demo package' title='Dependency Graph of packaging-demo package'>
+<a href='https://raw.githubusercontent.com/avr2002/python-packaging/main/packaging_demo/assets/dependency-graph.png' target='_blank'>
+    <img src='https://raw.githubusercontent.com/avr2002/python-packaging/main/packaging_demo/assets/dependency-graph.png' alt='Dependency Graph of packaging-demo package' title='Dependency Graph of packaging-demo package'>
+</a>
 
 * **
 
@@ -664,7 +668,7 @@ colors = ["rich"]
 ```bash
 # plugin based installation
 pip install '.[colors]'
-# here we demo with rich library, if user wants the output to be 
+# here we demo with rich library, if user wants the output to be
 # colorized then they can install our package like this.
 
 
@@ -694,3 +698,40 @@ pip install '.[all]'
 
 We can use [Snyk](https://snyk.io/advisor/python/fastapi) to check how stable, well supported, if any security issues, etc. are present for the dependencies which we are going to use for our package and then take the decision on using it in our project.
 
+* **
+
+# Continuous Delivery: Publishing to PyPI
+
+- Few key terms realted to Continuous Delivery
+  - DevOps, Waterfall, Agile, Scrum
+
+
+### Publishing to PyPI
+
+To pusblish our package to PyPI[Python Packaging Index], as stated in the [official guide](https://packaging.python.org/en/latest/), we use [`twine` CLI tool](https://twine.readthedocs.io/en/latest/).
+
+```bash
+pip install twine
+
+twine upload --help
+```
+
+1. Generate API Token for [PyPI Test](https://test.pypi.org/) or [PyPI Prod](https://pypi.org/)
+
+2. Build your python package: `python -m build --sdist --wheel "${PACKAGE_DIR}"`, here we're building both sdist and wheel, as recommended.
+
+3. Run the twine tool: `twine upload --repository testpypi ./dist/*`, uplading to test-pypi
+
+
+### Task Runner
+
+- `CMake` and `Makefile`
+
+  - `sudo apt-get install make`
+
+
+- [Taskfile](https://github.com/adriancooney/Taskfile)
+
+
+- [`justfile`](https://github.com/casey/just)
+- [pyinvoke](https://www.pyinvoke.org/)

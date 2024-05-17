@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 include-package-data = true
 
 [tool.setuptools.package-data]
-packaging_demo = ["**/*.json", "**/*png"]
+packaging_demo = ["**/*.json"]
 
 [project]
 name = "packaging-demo-avr"
