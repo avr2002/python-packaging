@@ -4,12 +4,15 @@ requires = ["setuptools>=61.0.0", "wheel"]
 # default value of build-backend is "setuptools.build_meta"
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.package-data]
-package_demo = ["*.json", "assets/*.png"]
+# include-package-data defaults to true, not needed to add in toml file
+[tool.setuptools]
+include-package-data = true
 
+[tool.setuptools.package-data]
+packaging_demo = ["**/*.json", "**/*png"]
 
 [project]
-name = "packaging-demo"
+name = "packaging-demo-avr"
 authors = [{ name = "Amit Vikram Raj", email = "avr13405@gmail.com" }]
 description = "Demo for Python Packaging"
 readme = "README.md"
@@ -19,11 +22,14 @@ license = { text = "MIT" }
 classifiers = ["Programming Language :: Python :: 3"]
 dependencies = ["numpy", "fastapi", 'importlib-metadata; python_version<"3.10"']
 # dynamic = ["version"]
-version = "0.0.0"
+version = "0.0.3"
 
 [project.optional-dependencies]
+test = ["pytest", "pytest-cov"]
+release = ["build", "twine"]
+static-code-qa = ["pre-commit"]
 # for developement
-dev = ["ruff", "mypy", "black"]
+dev = ["ruff", "mypy", "black", "packaging-demo[test, release, static-code-qa]"]
 # plugin based architecture
 colors = ["rich"]
 # install all dependencies
