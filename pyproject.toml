@@ -8,6 +8,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 include-package-data = true
 
+# adding data files in our package; moving from MANIFEST.in to toml file
 [tool.setuptools.package-data]
 packaging_demo = ["**/*.json"]
 
