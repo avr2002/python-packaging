@@ -1,6 +1,6 @@
 name: Build, Test, and Publish
 
-# triggers: whenever there is new changes pulled/pushed on this 
+# triggers: whenever there is new changes pulled/pushed on this
 # repo under given conditions, run the below jobs
 on:
   pull_request:
@@ -14,59 +14,122 @@ on:
 
 jobs:
 
-  build-test-and-publish:
-    
+  check-verison-txt:
     runs-on: ubuntu-latest
-    
     steps:
-    # github actions checksout, clones our repo, and checks out the branch we're working in
+      # github actions checksout, clones our repo, and checks out the branch we're working in
+      - uses: actions/checkout@v4
+        with:
+          # Number of commits to fetch. 0 indicates all history for all branches and tags
+          # fetching all tags so to aviod duplicate version tagging in 'Tag with the Release Version'
+          fetch-depth: 0
+      # tagging the release version to avoid duplicate releases
+      - name: Tag with the Release Version
+        run: |
+          git tag $(cat version.txt)
+
+
+  lint-format-and-static-code-checks:
+    runs-on: ubuntu-latest
+    steps:
     - uses: actions/checkout@v4
-      with:
-        # Number of commits to fetch. 0 indicates all history for all branches and tags
-        # fetching all tags so to aviod duplicate version tagging in 'Tag with the Release Version'
-        fetch-depth: 0
-    
     - name: Set up Python 3.8
       uses: actions/setup-python@v4
       with:
         python-version: 3.8
-    
-    # tagging the release version to avoid duplicate releases
-    - name: Tag with the Release Version
+    # caching dependencies
+    - uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install pre-commit
       run: |
-        git tag $(cat version.txt)
-
-    - name: Install Python Dependencies
-      run: |
-        /bin/bash -x run.sh install
-
+        pip install pre-commit
     - name: Lint, Format, and Other Static Code Quality Check
       run: |
         /bin/bash -x run.sh lint:ci
 
+
+  build-wheel-and-sdist:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+    - uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install build CLI
+      run: |
+        pip install build
     - name: Build Python Package
       run: |
         /bin/bash -x run.sh build
 
+    # uploading the built package to publish in the publish workflow
+    - name: Upload wheel and sdist
+      uses: actions/upload-artifact@v4
+      with:
+        name: wheel-and-sdist-artifact
+        path: ./dist/*
+
+
+  publish:
+    needs:
+      - check-verison-txt
+      - lint-format-and-static-code-checks
+      - build-wheel-and-sdist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+
+    # downloading the built package in 'build-wheel-and-sdist' workflow to publish
+    - name: Download wheel and sdist
+      uses: actions/download-artifact@v4
+      with:
+        name: wheel-and-sdist-artifact
+        path: ./dist/
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install twine CLI
+      run: |
+        pip install twine
+
     - name: Publish to Test PyPI
       # setting -x in below publish:test will not leak any secrets as they are masked in github
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |
         /bin/bash -x run.sh publish:test
       env:
         TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
 
     - name: Publish to Prod PyPI
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |
         /bin/bash -x run.sh publish:prod
       env:
         PROD_PYPI_TOKEN: ${{ secrets.PROD_PYPI_TOKEN }}
 
     - name: Push Tags
-      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |
        git push origin --tags
+
+
+
 
 
   # https://docs.github.com/en/actions/learn-github-actions/contexts#example-printing-context-information-to-the-log

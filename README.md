@@ -784,16 +784,16 @@ twine upload --help
 
 name: Build, Test, and Publish
 
-# triggers: whenever there is new changes pulled/pushed on this 
+# triggers: whenever there is new changes pulled/pushed on this
 # repo under given conditions, run the below jobs
 on:
   pull_request:
     types: [opened, synchronize]
-  
+
   push:
     branches:
       - main
-  
+
   # Manually trigger a workflow
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
   workflow_dispatch:
@@ -801,9 +801,9 @@ on:
 jobs:
 
   build-test-and-publish:
-    
+
     runs-on: ubuntu-latest
-    
+
     steps:
     # github actions checksout, clones our repo, and checks out the branch we're working in
     - uses: actions/checkout@v3
@@ -811,29 +811,29 @@ jobs:
         # Number of commits to fetch. 0 indicates all history for all branches and tags
         # fetching all tags so to aviod duplicate version tagging in 'Tag with the Release Version'
         fetch-depth: 0
-    
+
     - name: Set up Python 3.8
       uses: actions/setup-python@v3
       with:
         python-version: 3.8
-    
+
     # tagging the release version to avoid duplicate releases
     - name: Tag with the Release Version
       run: |
         git tag $(cat version.txt)
-    
+
     - name: Install Python Dependencies
       run: |
         /bin/bash -x run.sh install
-    
+
     - name: Lint, Format, and Other Static Code Quality Check
       run: |
         /bin/bash -x run.sh lint:ci
-    
+
     - name: Build Python Package
       run: |
         /bin/bash -x run.sh build
-    
+
     - name: Publish to Test PyPI
       # setting -x in below publish:test will not leak any secrets as they are masked in github
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
@@ -841,14 +841,14 @@ jobs:
         /bin/bash -x run.sh publish:test
       env:
         TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
-    
+
     - name: Publish to Prod PyPI
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |
         /bin/bash -x run.sh publish:prod
       env:
         PROD_PYPI_TOKEN: ${{ secrets.PROD_PYPI_TOKEN }}
-    
+
     - name: Push Tags
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |
@@ -860,20 +860,20 @@ jobs:
 1. Locking Requirements
    - It's not really recommended to pin exact versions of dependencies to avoid future conflict
    - But it's good practice to store them in the requirements file for future debugging.
-   - Tools: 
+   - Tools:
 
 2. Dependency Caching
    - Whenever github actions gets executed in the github CI, everytime it's run on a fresh container.
     Thus, everytime we'll have to download and re-install dependencies from pip again and again;
     which is not a good as it's inefficeint and slows our workflow.
-   
+
    - Thus we would want to install all the dependencies when the workflow ran first and use it every
      time a new worflow is run.
-   
-   - GitHub Actions provide this functionality by caching the dependencies, it stores the installed 
-     dependencies(`~/.cache/pip`) and downloads it everytime a new workflow is run. 
+
+   - GitHub Actions provide this functionality by caching the dependencies, it stores the installed
+     dependencies(`~/.cache/pip`) and downloads it everytime a new workflow is run.
      [**Docs**](https://github.com/actions/cache/blob/main/examples.md#python---pip)
-  
+
    ```toml
    - uses: actions/cache@v3
      with:
@@ -884,3 +884,29 @@ jobs:
    ```
 
 3. Parallelization
+
+   - We moved from above shown workflow to now a parallelized workflow as shown below.
+   - This helps in faster running of workflow, helping discover bugs in any steps
+     at the same time which was not possible in linear flow as earlier.
+
+```toml
+# See .github/workflows/publish.yaml
+
+jobs:
+
+  check-verison-txt:
+    ...
+
+  lint-format-and-static-code-checks:
+    ....
+
+  build-wheel-and-sdist:
+    ...
+
+  publish:
+    needs:
+      - check-verison-txt
+      - lint-format-and-static-code-checks
+      - build-wheel-and-sdist
+    ...
+```
