@@ -11,13 +11,23 @@ authors = [{ name = "Amit Vikram Raj", email = "avr13405@gmail.com" }]
 description = "Demo for Python Packaging"
 readme = "README.md"
 requires-python = ">=3.8"
-keywords = ["one", "two"]
+keywords = [
+    "python", "bash", "makefile", "pypi", "ci-cd", "setuptools", "wheels", 
+    "package-development", "github-actions", "pypi-package", "pre-commit-hooks", 
+    "pyproject-toml", "gitactions-workflow", "github-actions-enabled", "pre-commit-ci",
+    "pre-commit-config"
+]
 license = { text = "MIT" }
 classifiers = ["Programming Language :: Python :: 3"]
 dependencies = ["numpy", "fastapi", 'importlib-metadata; python_version<"3.10"']
 dynamic = ["version"]
 # version = "0.0.3"
 # https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#dynamic-metadata
+
+[project.urls]
+# Ref: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+Repository = "https://github.com/avr2002/python-packaging"
+Documentation = "https://github.com/avr2002/python-packaging/blob/main/README.md"
 
 [tool.setuptools.dynamic]
 # every while making changes in package, you can change the verison in one of these files
