@@ -25,8 +25,12 @@ function install {
     python -m pip install --editable "${THIS_DIR}/[dev]"
 }
 
-function lint {
+function lint:ci {
     SKIP=no-commit-to-branch pre-commit run --all-files
+}
+
+function lint {
+    pre-commit run --all-files
 }
 
 function build {
