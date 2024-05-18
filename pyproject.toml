@@ -4,13 +4,6 @@ requires = ["setuptools>=61.0.0", "wheel"]
 # default value of build-backend is "setuptools.build_meta"
 build-backend = "setuptools.build_meta"
 
-# include-package-data defaults to true, not needed to add in toml file
-[tool.setuptools]
-include-package-data = true
-
-# adding data files in our package; moving from MANIFEST.in to toml file
-[tool.setuptools.package-data]
-packaging_demo = ["**/*.json"]
 
 [project]
 name = "packaging-demo-avr"
@@ -31,16 +24,25 @@ dynamic = ["version"]
 # version = {attr = "packaging_demo.VERSION"} # version read by 'packaging_demo/__init__.py' file
 version = {file  = ["version.txt"]} # version read by 'version.txt' file in root folder
 
+# include-package-data defaults to true, not needed to add in toml file
+[tool.setuptools]
+include-package-data = true
+
+# adding data files in our package; moving from MANIFEST.in to toml file
+[tool.setuptools.package-data]
+packaging_demo = ["**/*.json"]
+
+
 [project.optional-dependencies]
 test = ["pytest", "pytest-cov"]
 release = ["build", "twine"]
 static-code-qa = ["pre-commit"]
 # for developement
-dev = ["ruff", "mypy", "black", "packaging-demo[test, release, static-code-qa]"]
+dev = ["ruff", "mypy", "black", "packaging-demo-avr[test, release, static-code-qa]"]
 # plugin based architecture
 colors = ["rich"]
 # install all dependencies
-all = ["packaging-demo[dev, colors]"]
+all = ["packaging-demo-avr[dev, colors]"]
 
 
 # Adding ruff.toml to pyproject.toml

@@ -8,6 +8,13 @@ set -e
 THIS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 function load-dotenv {
+    # adding this if condition so that this does not fail in
+    # github actions CI
+    if [ ! -f "$THIS_DIR/.env" ]; then
+        echo "no .env file found"
+        return 1
+    fi
+
     while read -r line; do
         export "$line"
     done < <(grep -v '^#' "${THIS_DIR}/.env" | grep -v '^$')
@@ -42,6 +49,8 @@ function release:prod {
 # in bash colons are valid characters to put in identifier names
 function publish:test {
     # load environment variable
+    # this will not work in github CI, as we're not pushing our .env(secrets) file
+    # to git, instead we're adding necessary tokens to github-secrets
     load-dotenv || true
 
     twine upload "${THIS_DIR}/dist/*" \
@@ -52,7 +61,7 @@ function publish:test {
 
 function publish:prod {
     # load environment variable
-    load-dotenv || true
+    load-dotenv || true   # this will not work in github CI
 
     twine upload "${THIS_DIR}/dist/*" \
         --repository pypi \
