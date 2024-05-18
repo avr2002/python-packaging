@@ -12,8 +12,8 @@ description = "Demo for Python Packaging"
 readme = "README.md"
 requires-python = ">=3.8"
 keywords = [
-    "python", "bash", "makefile", "pypi", "ci-cd", "setuptools", "wheels", 
-    "package-development", "github-actions", "pypi-package", "pre-commit-hooks", 
+    "python", "bash", "makefile", "pypi", "ci-cd", "setuptools", "wheels",
+    "package-development", "github-actions", "pypi-package", "pre-commit-hooks",
     "pyproject-toml", "gitactions-workflow", "github-actions-enabled", "pre-commit-ci",
     "pre-commit-config"
 ]

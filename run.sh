@@ -11,7 +11,7 @@ function load-dotenv {
     # adding this if condition so that this does not fail in
     # github actions CI
     if [ ! -f "$THIS_DIR/.env" ]; then
-        echo "no .env file found"
+        echo "No .env file found"
         return 1
     fi
 
@@ -25,8 +25,12 @@ function install {
     python -m pip install --editable "${THIS_DIR}/[dev]"
 }
 
-function lint {
+function lint:ci {
     SKIP=no-commit-to-branch pre-commit run --all-files
+}
+
+function lint {
+    pre-commit run --all-files
 }
 
 function build {
