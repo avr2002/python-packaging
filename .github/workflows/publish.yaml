@@ -20,18 +20,18 @@ jobs:
     
     steps:
     # github actions checksout, clones our repo, and checks out the branch we're working in
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         # Number of commits to fetch. 0 indicates all history for all branches and tags
         # fetching all tags so to aviod duplicate version tagging in 'Tag with the Release Version'
         fetch-depth: 0
     
     - name: Set up Python 3.8
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: 3.8
     
-        # tagging the release version to avoid duplicate releases
+    # tagging the release version to avoid duplicate releases
     - name: Tag with the Release Version
       run: |
         git tag $(cat version.txt)
@@ -62,7 +62,7 @@ jobs:
         /bin/bash -x run.sh publish:prod
       env:
         PROD_PYPI_TOKEN: ${{ secrets.PROD_PYPI_TOKEN }}
-        
+
     - name: Push Tags
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |

@@ -854,3 +854,33 @@ jobs:
       run: |
        git push origin --tags
 ```
+
+### GitHub Actions Optimizations
+
+1. Locking Requirements
+   - It's not really recommended to pin exact versions of dependencies to avoid future conflict
+   - But it's good practice to store them in the requirements file for future debugging.
+   - Tools: 
+
+2. Dependency Caching
+   - Whenever github actions gets executed in the github CI, everytime it's run on a fresh container.
+    Thus, everytime we'll have to download and re-install dependencies from pip again and again;
+    which is not a good as it's inefficeint and slows our workflow.
+   
+   - Thus we would want to install all the dependencies when the workflow ran first and use it every
+     time a new worflow is run.
+   
+   - GitHub Actions provide this functionality by caching the dependencies, it stores the installed 
+     dependencies(`~/.cache/pip`) and downloads it everytime a new workflow is run. 
+     [**Docs**](https://github.com/actions/cache/blob/main/examples.md#python---pip)
+  
+   ```toml
+   - uses: actions/cache@v3
+     with:
+      path: ~/.cache/pip
+      key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      restore-keys: |
+        ${{ runner.os }}-pip-
+   ```
+
+3. Parallelization
