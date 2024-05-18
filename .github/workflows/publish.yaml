@@ -15,7 +15,9 @@ on:
 jobs:
 
   build-test-and-publish:
+    
     runs-on: ubuntu-latest
+    
     steps:
     # github actions checksout, clones our repo, and checks out the branch we're working in
     - uses: actions/checkout@v3
@@ -23,23 +25,29 @@ jobs:
         # Number of commits to fetch. 0 indicates all history for all branches and tags
         # fetching all tags so to aviod duplicate version tagging in 'Tag with the Release Version'
         fetch-depth: 0
+    
     - name: Set up Python 3.8
       uses: actions/setup-python@v3
       with:
         python-version: 3.8
-    # tagging the release version to avoid duplicate releases
+    
+        # tagging the release version to avoid duplicate releases
     - name: Tag with the Release Version
       run: |
         git tag $(cat version.txt)
+
     - name: Install Python Dependencies
       run: |
         /bin/bash -x run.sh install
+
     - name: Lint, Format, and Other Static Code Quality Check
       run: |
         /bin/bash -x run.sh lint:ci
+
     - name: Build Python Package
       run: |
         /bin/bash -x run.sh build
+
     - name: Publish to Test PyPI
       # setting -x in below publish:test will not leak any secrets as they are masked in github
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
@@ -47,12 +55,14 @@ jobs:
         /bin/bash -x run.sh publish:test
       env:
         TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+
     - name: Publish to Prod PyPI
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |
         /bin/bash -x run.sh publish:prod
       env:
         PROD_PYPI_TOKEN: ${{ secrets.PROD_PYPI_TOKEN }}
+        
     - name: Push Tags
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       run: |

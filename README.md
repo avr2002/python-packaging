@@ -775,3 +775,82 @@ twine upload --help
 ## Detailed CI/CD Workflow for Python Packages
 
 ![Detailed CI/CD Workflow for Python Packages](https://github.com/avr2002/python-packaging/blob/main/packaging_demo/assets/detailed-workflow.png?raw=true)
+
+
+### GitHub CI/CD Workflow in worflows yaml file
+
+```toml
+# .github/workflows/publish.yaml
+
+name: Build, Test, and Publish
+
+# triggers: whenever there is new changes pulled/pushed on this 
+# repo under given conditions, run the below jobs
+on:
+  pull_request:
+    types: [opened, synchronize]
+  
+  push:
+    branches:
+      - main
+  
+  # Manually trigger a workflow
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
+  workflow_dispatch:
+
+jobs:
+
+  build-test-and-publish:
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+    # github actions checksout, clones our repo, and checks out the branch we're working in
+    - uses: actions/checkout@v3
+      with:
+        # Number of commits to fetch. 0 indicates all history for all branches and tags
+        # fetching all tags so to aviod duplicate version tagging in 'Tag with the Release Version'
+        fetch-depth: 0
+    
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+    
+    # tagging the release version to avoid duplicate releases
+    - name: Tag with the Release Version
+      run: |
+        git tag $(cat version.txt)
+    
+    - name: Install Python Dependencies
+      run: |
+        /bin/bash -x run.sh install
+    
+    - name: Lint, Format, and Other Static Code Quality Check
+      run: |
+        /bin/bash -x run.sh lint:ci
+    
+    - name: Build Python Package
+      run: |
+        /bin/bash -x run.sh build
+    
+    - name: Publish to Test PyPI
+      # setting -x in below publish:test will not leak any secrets as they are masked in github
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      run: |
+        /bin/bash -x run.sh publish:test
+      env:
+        TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+    
+    - name: Publish to Prod PyPI
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      run: |
+        /bin/bash -x run.sh publish:prod
+      env:
+        PROD_PYPI_TOKEN: ${{ secrets.PROD_PYPI_TOKEN }}
+    
+    - name: Push Tags
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      run: |
+       git push origin --tags
+```
