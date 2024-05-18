@@ -31,7 +31,18 @@ jobs:
     - name: Build Python Package
       run: |
         /bin/bash -x run.sh build
-
+    - name: Publish to Test PyPI
+      # setting -x in below publish:test will not leak any secrets as they are masked in github
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      run: |
+        /bin/bash -x run.sh publish:test
+      env:
+        TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+        PROD_PYPI_TOKEN: ${{ secrets.PROD_PYPI_TOKEN }}
+    - name: Publish to Prod PyPI
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      run: |
+        /bin/bash -x run.sh publish:prod
       env:
         TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
         PROD_PYPI_TOKEN: ${{ secrets.PROD_PYPI_TOKEN }}
