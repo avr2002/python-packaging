@@ -41,7 +41,7 @@ jobs:
     - uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/.pre-commit-config.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: Install pre-commit
@@ -63,7 +63,7 @@ jobs:
     - uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-build
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: Install build CLI
@@ -105,7 +105,7 @@ jobs:
     - uses: actions/cache@v4
       with:
         path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        key: ${{ runner.os }}-pip-twine
         restore-keys: |
           ${{ runner.os }}-pip-
     - name: Install twine CLI
