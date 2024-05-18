@@ -468,8 +468,14 @@ keywords = ["one", "two"]
 license = { text = "MIT" }
 classifiers = ["Programming Language :: Python :: 3"]
 dependencies = ["numpy", 'importlib-metadata; python_version<"3.10"']
-# dynamic = ["version"]
-version = "0.0.0"
+dynamic = ["version"]
+# version = "0.0.3"
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#dynamic-metadata
+
+[tool.setuptools.dynamic]
+# every while making changes in package, you can change the verison in one of these files
+# version = {attr = "packaging_demo.VERSION"} # version read by 'packaging_demo/__init__.py' file
+version = {file  = ["version.txt"]} # version read by 'version.txt' file in root folder
 ```
 
 >> `python -m build --sdist --wheel .` - Runs perfectly, we got rid of another config file (`setup.cfg`)
