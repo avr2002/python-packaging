@@ -28,8 +28,9 @@ jobs:
         /bin/bash run.sh build
         /bin/bash run.sh publish:test
 
-      # env:
-      #   TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+      env:
+        TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+        PROD_PYPI_TOKEN: ${{ secrets.PROD_PYPI_TOKEN }}
     
     # - name: Install dependencies
     #   run: |
