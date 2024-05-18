@@ -741,3 +741,37 @@ twine upload --help
 
 - [`justfile`](https://github.com/casey/just)
 - [pyinvoke](https://www.pyinvoke.org/)
+
+* **
+
+# Continuous Delivery using GitHub Actions
+
+## Goals
+1. Understand Continuous Delivery
+2. Know the parts of a CI/CD pipeline for Python Packages
+3. Have an advanced understanding of GitHub Actions
+
+
+
+## Delivery "Environments"
+
+>Dev $\rightarrow$ QA/Staging $\rightarrow$ Prod
+
+
+- Pre-release version namings
+  - 0.0.0rc0 (rc = release candidate)
+  - 0.0.0.rc1
+  - 0.0.0a0 (alpha)
+  - 0.0.0b1 (beta)
+
+![alt text](https://github.com/avr2002/python-packaging/blob/main/packaging_demo/assets/cd.png?raw=true)
+
+
+## High-level CI/CD Workflow for Python Packages
+
+![CI/CD Workflow for Python Packages](https://github.com/avr2002/python-packaging/blob/main/packaging_demo/assets/workflow.png?raw=true)
+
+
+## Detailed CI/CD Workflow for Python Packages
+
+![Detailed CI/CD Workflow for Python Packages](https://github.com/avr2002/python-packaging/blob/main/packaging_demo/assets/detailed-workflow.png?raw=true)
