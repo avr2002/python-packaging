@@ -87,6 +87,7 @@ jobs:
       - lint-format-and-static-code-checks
       - build-wheel-and-sdist
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.8

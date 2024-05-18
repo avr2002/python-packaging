@@ -779,7 +779,7 @@ twine upload --help
 
 ### GitHub CI/CD Workflow in worflows yaml file
 
-```toml
+```yaml
 # .github/workflows/publish.yaml
 
 name: Build, Test, and Publish
@@ -889,7 +889,7 @@ jobs:
    - This helps in faster running of workflow, helping discover bugs in any steps
      at the same time which was not possible in linear flow as earlier.
 
-```toml
+```yaml
 # See .github/workflows/publish.yaml
 
 jobs:
