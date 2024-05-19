@@ -74,6 +74,7 @@ jobs:
         /bin/bash -x run.sh build
 
     # uploading the built package to publish in the publish workflow
+    # https://github.com/actions/upload-artifact
     - name: Upload wheel and sdist
       uses: actions/upload-artifact@v4
       with:
@@ -96,6 +97,7 @@ jobs:
         python-version: 3.8
 
     # downloading the built package in 'build-wheel-and-sdist' workflow to publish
+    # https://github.com/actions/download-artifact
     - name: Download wheel and sdist
       uses: actions/download-artifact@v4
       with:
