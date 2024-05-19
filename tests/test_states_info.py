@@ -1,7 +1,9 @@
-from packaging_demo.states_info import is_city_capital_of_state
 import pytest
 
+from packaging_demo.states_info import is_city_capital_of_state
 
+
+# multiple tests in one
 @pytest.mark.parametrize(
     argnames="city_name, state, is_capital",
     argvalues=[
@@ -13,8 +15,7 @@ import pytest
     ],
 )
 def test_is_city_capital_of_state(city_name: str, state: str, is_capital: bool):
-    assert is_city_capital_of_state(city_name=city_name, state=state)\
-        == is_capital
+    assert is_city_capital_of_state(city_name=city_name, state=state) == is_capital
 
 
 # def test_is_city_capital_of_state_correct():

@@ -33,6 +33,23 @@ function lint {
     pre-commit run --all-files
 }
 
+function test:quick {
+    python -m pytest -m 'not slow' "${THIS_DIR}/tests/"
+}
+
+function test {
+    # run only specified tests, if none specified, run all
+    if [ $# -eq 0 ]; then
+        python -m pytest "${THIS_DIR}/tests/"
+    else
+        python -m pytest "$@"
+    fi
+}
+# Example usage:
+# ./run.sh test
+# ./run.sh test tests/test_states_info.py::test_is_city_capital_of_state
+# ./run.sh test tests/test_slow.py::test_slow_add
+
 function build {
     python -m build --sdist --wheel "${THIS_DIR}"
 }

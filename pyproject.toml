@@ -55,6 +55,13 @@ colors = ["rich"]
 all = ["packaging-demo-avr[dev, colors]"]
 
 
+# Registering custom marks in pytest to avoid warnings
+# https://docs.pytest.org/en/stable/how-to/mark.html
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')"
+]
+
 # Adding ruff.toml to pyproject.toml
 [tool.ruff]
 line-length = 119
@@ -80,7 +87,7 @@ unfixable = ["B"]
 profile = "black"
 multi_line_output = "VERTICAL_HANGING_INDENT"
 force_grid_wrap = 2
-line_length = 119
+line_length = 99
 
 # copying balck config from .black.toml to pyproject.toml
 [tool.black]
@@ -89,6 +96,7 @@ exclude = ".venv"
 
 # copying flake8 config from .flake8 to pyproject.toml
 [tool.flake8]
+max-line-length = 119
 docstring-convention = "all"
 extend-ignore = [
     "D107",
@@ -103,7 +111,6 @@ extend-ignore = [
     "DAR101",
     "DAR201",]
 exclude = [".venv"]
-max-line-length = 119
 
 # radon
 radon-max-cc = 10

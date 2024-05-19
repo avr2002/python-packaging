@@ -1,3 +1,6 @@
 {
-    "isort.check": true
+    "isort.check": true,
+    "flake8.args": [
+        "\"flake8.args\" = [\"--config=../pyproject.toml\"]"
+    ]
 }
