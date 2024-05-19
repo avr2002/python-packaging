@@ -40,7 +40,9 @@ function test:quick {
 function test {
     # run only specified tests, if none specified, run all
     if [ $# -eq 0 ]; then
-        python -m pytest "${THIS_DIR}/tests/"
+        python -m pytest "${THIS_DIR}/tests/" \
+        --cov "${THIS_DIR}/packaging_demo" \
+        --cov-report html
     else
         python -m pytest "$@"
     fi
