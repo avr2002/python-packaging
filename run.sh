@@ -44,7 +44,7 @@ function test:quick {
         --cov-report xml \
         --junit-xml "$THIS_DIR/test-reports/report.xml" \
         --cov-fail-under 60 || ((PYTEST_EXIT_STATUS+=$?))
-    
+
     mv coverage.xml "$THIS_DIR/test-reports/"
     mv htmlcov "$THIS_DIR/test-reports/"
     mv .coverage "$THIS_DIR/test-reports/"
@@ -72,7 +72,7 @@ function test {
         --cov-report xml \
         --junit-xml "$THIS_DIR/test-reports/report.xml" \
         --cov-fail-under 60 || ((PYTEST_EXIT_STATUS+=$?))
-    
+
     mv coverage.xml "$THIS_DIR/test-reports/"
     mv htmlcov "$THIS_DIR/test-reports/"
     mv .coverage "$THIS_DIR/test-reports/"
@@ -121,7 +121,7 @@ function test:ci {
         --cov-report xml \
         --junit-xml "$THIS_DIR/test-reports/report.xml" \
         --cov-fail-under 60 || ((PYTEST_EXIT_STATUS+=$?))
-    
+
     mv coverage.xml "$THIS_DIR/test-reports/"
     mv htmlcov "$THIS_DIR/test-reports/"
     mv .coverage "$THIS_DIR/test-reports/"

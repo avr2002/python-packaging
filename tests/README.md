@@ -39,25 +39,25 @@
 
 
 - **Test Coverage**
-  - In blak box testing, when we write our tests and our tests do try to test for behaviors 
+  - In blak box testing, when we write our tests and our tests do try to test for behaviors
     instead of implementations of behaviors.
-  
-  - So we probably want enough tests at least to check in an automated way that 
+
+  - So we probably want enough tests at least to check in an automated way that
     all of the core behaviors of our code base are still intact.
 
   - Tests that tests the core functionality of our package/app, etc. are much more important
     to implement than the more granular unit tests for private modules in the codebase that
     aren't publicly exposed.
 
-  - However, tests that do check the behaviors on invisible or non exposed parts of your codebase still 
-    do have some value, and that is if you have tests, then people who go to modify your code will be 
-    less afraid to try and modify your code because they'll be able to check to see if their modifications 
+  - However, tests that do check the behaviors on invisible or non exposed parts of your codebase still
+    do have some value, and that is if you have tests, then people who go to modify your code will be
+    less afraid to try and modify your code because they'll be able to check to see if their modifications
     actually broke the particular unit of code that they're working on.
 
-  - One check or test that is nice to implement is to check that every single line of our source 
+  - One check or test that is nice to implement is to check that every single line of our source
     code gets executed.
-  
-  - **Test Coverage reports does exactly the above, it tells the percentage of lines of your program 
+
+  - **Test Coverage reports does exactly the above, it tells the percentage of lines of your program
     that actually got executed.**
 
   - Tools to generate coverage report:
@@ -83,13 +83,13 @@
 
 
   - Optimizing for 100% Test Coverage is not always helpful
-  
-    - It is possible that you could have 100% test coverage and that your tests not 
+
+    - It is possible that you could have 100% test coverage and that your tests not
       actually be testing the functionality of the code.
 
-    - So you could have 100% test coverage and your program could be completely broken, 
-      like, yes, we executed it, but at the minimum, all executing does is verify that 
-      we don't have syntax errors or something, or that we don't run into a case where 
+    - So you could have 100% test coverage and your program could be completely broken,
+      like, yes, we executed it, but at the minimum, all executing does is verify that
+      we don't have syntax errors or something, or that we don't run into a case where
       we raise an exception.
 
     - There is a marginal increase in number of tests that we may have to write to attain
@@ -105,4 +105,3 @@
       ```
 
 ## Testing in GitHub Actions
-
