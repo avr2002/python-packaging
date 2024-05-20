@@ -62,10 +62,13 @@
 
   - Tools to generate coverage report:
     - [Coverage.py](https://coverage.readthedocs.io/en/7.5.1/)
-    - [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/): Wrapper around pytest.
+    - [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/): Wrapper around coverage.py for pytest
+      - `pip install pytest-cov`
 
   - Generating Coverage Report using `pytest-cov`:
     ```bash
+    # get help: pytest --help
+
     python -m pytest "${THIS_DIR}/tests/" \
         --cov "${THIS_DIR}/packaging_demo" \
         --cov-report html
@@ -77,3 +80,26 @@
     ```
 
     ![test-coverage](../packaging_demo/assets/test-coverage.png)
+
+
+  - Optimizing for 100% Test Coverage is not always helpful
+  
+    - It is possible that you could have 100% test coverage and that your tests not 
+      actually be testing the functionality of the code.
+
+    - So you could have 100% test coverage and your program could be completely broken, 
+      like, yes, we executed it, but at the minimum, all executing does is verify that 
+      we don't have syntax errors or something, or that we don't run into a case where 
+      we raise an exception.
+
+    - There is a marginal increase in number of tests that we may have to write to attain
+      100% test coverage of our codebase. And it's not worth developer's time because along
+      with our source code we would have to maintain our test suite too.
+
+    - We can enforce a minimum threshold for our test coverage, say 75% or 80% for our codebase.
+      The threshold is subjective to each codebase and decided by the developer.
+
+      ```bash
+      pytest --help
+      >>> --cov-fail-under=MIN  Fail if the total coverage is less than MIN.
+      ```
