@@ -103,3 +103,6 @@
       pytest --help
       >>> --cov-fail-under=MIN  Fail if the total coverage is less than MIN.
       ```
+
+## Testing in GitHub Actions
+

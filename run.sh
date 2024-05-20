@@ -90,6 +90,44 @@ function serve-coverage-report {
     python -m http.server --directory "$THIS_DIR/htmlcov/"
 }
 
+function test:wheel-locally {
+    # deactivate current virtual env(.venv), create a new venv
+    # build the package, install the wheel, run our tests on it(test:ci),
+    # cleanup
+    source deactivate || true
+    rm -rf test-env || true
+    python -m venv test-env
+    source test-env/bin/activate
+    clean || true
+    pip install build
+    build
+    pip install ./dist/*.whl pytest pytest-cov
+    test:ci
+    source deactivate
+    rm -rf test-env
+    clean
+    # lastly activate your virtual environment
+    source .venv/bin/activate
+}
+
+
+function test:ci {
+    PYTEST_EXIT_STATUS=0
+    INSTALLED_PKG_DIR="$(python -c 'import packaging_demo; print(packaging_demo.__path__[0])')"
+    python -m pytest "${@:-$THIS_DIR/tests/}" \
+        --cov "$INSTALLED_PKG_DIR" \
+        --cov-report html \
+        --cov-report term \
+        --cov-report xml \
+        --junit-xml "$THIS_DIR/test-reports/report.xml" \
+        --cov-fail-under 60 || ((PYTEST_EXIT_STATUS+=$?))
+    
+    mv coverage.xml "$THIS_DIR/test-reports/"
+    mv htmlcov "$THIS_DIR/test-reports/"
+    mv .coverage "$THIS_DIR/test-reports/"
+
+    return $PYTEST_EXIT_STATUS
+}
 
 function build {
     python -m build --sdist --wheel "${THIS_DIR}"
@@ -141,7 +179,7 @@ function clean {
         -o -name "*.egg-info" \
         -o -name "*htmlcov" \
     \) \
-    -not -path "./.venv/*" \
+    -not -path "./*env/*" \
     -exec rm -r {} +
 }
 
