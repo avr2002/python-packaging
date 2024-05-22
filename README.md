@@ -4,6 +4,13 @@
 2. Non-painful import statements
 3. Reproduciblity
 
+* **
+
+## `PYTHONPATH` Variable
+
+- [**Refer to this README for indepth details**](https://github.com/avr2002/python-packaging/tree/main/packaging_demo/my_folder)  
+
+* **
 
 ## Packaging terms:
 

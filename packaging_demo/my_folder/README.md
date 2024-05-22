@@ -1,6 +1,43 @@
 ## `$PYTHONPATH` and Nested Imports
 
 
+### `PYTHONPATH` Variable
+
+- `PATH` variable in Bash Terminal
+
+  ```bash
+  echo $PATH
+  ```
+
+  - This will give you a colon seperated list of directories, one of them being location to 
+    python executable, which you can verify using below command too
+
+    ```bash
+    which python
+    where python # for windows
+    ```
+
+- Now if we were to type a python command in our terminal, our bash/zshell would loop over from 
+  start to finish this colon separated list and the first folder where it found an executable 
+  program named Python.
+
+- In essense this is how imports work in bash, when you type A command, this is sort of an import process 
+  by which the executable or we could call it a module in Python terms is discovered and then loaded 
+  in or in this case, executed, like below:
+
+  ```python
+  python my_folder/some_python_file.py
+  ```
+
+- **Python uses something similar to discover importable modules. Python has a variable called the `PYTHONPATH` variable, which is also a list of folders(like `PATH` in bash) where Python looks for modules when you do these import statements.**
+
+-  What is `PYTHONPATH`?
+
+   - `PYTHONPATH` is an environment variable which you can set to add additional directories that Python should add to the list of paths to look for modules and packages.
+
+   - The directories specified in `PYTHONPATH` are appended to the default list of directories Python searches for modules, which includes the standard library and site-packages.
+
+
 ### The Problem
 
 Directory Structure:
