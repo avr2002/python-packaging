@@ -28,6 +28,7 @@ def is_city_capital_of_state(city_name: str, state: str) -> bool:
     return matched_city["state"] == state
 
 
+# python -m packaging_demo.states_info
 if __name__ == "__main__":
     # python -m packaging_demo.states_info
     is_capitol = is_city_capital_of_state(
