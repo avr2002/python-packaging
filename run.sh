@@ -91,22 +91,33 @@ function serve-coverage-report {
 }
 
 function test:wheel-locally {
-    # deactivate current virtual env(.venv), create a new venv
-    # build the package, install the wheel, run our tests on it(test:ci),
-    # cleanup
+    # deactivate current virtual env(.venv)
     source deactivate || true
+    # clean up existing test-venv if available
     rm -rf test-env || true
+
+    # create a new test virtual env & activate it
     python -m venv test-env
     source test-env/bin/activate
+
+    # clean any cache files if available
     clean || true
+
+    # install build CLI and build the package
     pip install build
     build
+    # install the package wheel and test dependencies
     pip install ./dist/*.whl pytest pytest-cov
+
+    # run tests on wheel
     test:ci
+
+    # clear up test virtual env
     source deactivate
     rm -rf test-env
     clean
-    # lastly activate your virtual environment
+
+    # lastly activate your main virtual environment
     source .venv/bin/activate
 }
 

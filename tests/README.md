@@ -105,3 +105,80 @@
       ```
 
 ## Testing in GitHub Actions
+
+- In github actions each time you run a workflow it's run on a fresh linux machine(a docker container).
+
+- So, what is it going to take to execute our tests on a fresh Linux machine?
+
+- Well, we're probably going to need our code because our code contains the tests and it also contains the source code, although we wouldn't really want to test our source code inside `packaging_demo` folder.
+
+- And the reason why is because it's not actually our source code that we want to test. Or in other words, if we clone our repository, what we want to test isn't actually the code that's here in `packaging_demo`.
+
+- Testing the source code works well for local development but it's not going to be great for running in GitHub Actions.
+
+- But what we should really be testing is the version of our code that our customers are going to be using. And so it isn't this code that we want to test, we want to test is actually the package that we build, the distribution package that we build, aka the wheel or the source distribution.
+
+- Another reason for testing the whl package that we built is, there are number of ways in which we can mess up or break the wheel that gets build. Remember, a wheel file is just a zipped file containing our source code or pre-complied binaries.
+  - So, for example when you build a wheel, you might have accidentally left out a `__init__.py` in one of your source folder. And so when the wheel gets built, an entire subdirectory of your code could not be included in the wheel.
+
+  - Or you might have missed to include a necessary data file in the wheel due to configuration mistakes in our `pyproject.toml` file, for example in our case it might be `cities.json`
+
+
+- So, since we're vending our source code as a package which is going to end up on Pypi, it's the packaged version of our code that we want to test.
+
+
+  ```yaml
+    execute-tests:
+      needs:
+        - build-wheel-and-sdist
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - name: Download wheel and sdist
+        uses: actions/download-artifact@v4
+        with:
+          name: wheel-and-sdist-artifact
+          path: ./dist/
+
+      - name: Install test dependencies
+        run: |
+          pip install pytest pytest-cov ./dist/*.whl
+      - name: Testing the build wheel
+        run: |
+          /bin/bash -x run.sh test:ci
+  ```
+
+- The below test function determines the path where our built package is installed(`INSTALLED_PKG_DIR`),
+  and then points that source code to pytest to test on it(`--cov "$INSTALLED_PKG_DIR"`).
+
+  ```bash
+  # run.sh
+  # the test:ci function
+  function test:ci {
+      PYTEST_EXIT_STATUS=0
+
+      # Determine the installed package directory by using Python to import the package and print its path
+      INSTALLED_PKG_DIR="$(python -c 'import packaging_demo; print(packaging_demo.__path__[0])')"
+
+      python -m pytest "${@:-$THIS_DIR/tests/}" \
+          --cov "$INSTALLED_PKG_DIR" \
+          --cov-report html \
+          --cov-report term \
+          --cov-report xml \
+          --junit-xml "$THIS_DIR/test-reports/report.xml" \
+          --cov-fail-under 60 || ((PYTEST_EXIT_STATUS+=$?))
+
+      mv coverage.xml "$THIS_DIR/test-reports/"
+      mv htmlcov "$THIS_DIR/test-reports/"
+      mv .coverage "$THIS_DIR/test-reports/"
+
+      return $PYTEST_EXIT_STATUS
+  }
+  ```
+
+- **So this is how tests are performed in GitHub CI.**
