@@ -157,6 +157,7 @@ jobs:
     # in GitHub settings 'Actions/General'
     - name: Push Tags
       run: |
+       git tag $(cat version.txt)
        git push origin --tags
 
 

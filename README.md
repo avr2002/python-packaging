@@ -881,7 +881,7 @@ jobs:
      dependencies(`~/.cache/pip`) and downloads it everytime a new workflow is run.
      [**Docs**](https://github.com/actions/cache/blob/main/examples.md#python---pip)
 
-   ```toml
+   ```yaml
    - uses: actions/cache@v3
      with:
       path: ~/.cache/pip
@@ -889,6 +889,18 @@ jobs:
       restore-keys: |
         ${{ runner.os }}-pip-
    ```
+
+   - Pip dependency caching using [`setup-python`](https://github.com/actions/setup-python?tab=readme-ov-file#caching-packages-dependencies) github action
+
+    ```yaml
+    steps:
+   - uses: actions/checkout@v4
+   - uses: actions/setup-python@v5
+     with:
+       python-version: '3.9'
+       cache: 'pip' # caching pip dependencies
+   - run: pip install -r requirements.txt
+    ```
 
 3. Parallelization
 
